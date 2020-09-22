@@ -26,8 +26,6 @@ jobs:
           at: .
       - aws-cli/setup:
           profile-name: default
-      - run: echo $AWS_SECRET_ACCESS_KEY
-      - run: echo ${AWS_SECRET_ACCESS_KE}
       - run:
           name: Upload file to S3
           command: aws s3 sync ./build/ s3://intro-app --delete
