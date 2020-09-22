@@ -31,10 +31,10 @@ jobs:
           command: aws s3 sync ./build/ s3://circle-ci-s3-deploy --delete
 
 workflows:
-  build:
+  run:
     jobs:
       - build_project
       - deploy_project:
-        requires:
-          - build_project
-        context: aws-context
+          context: aws-context
+          requires:
+            - build_project
