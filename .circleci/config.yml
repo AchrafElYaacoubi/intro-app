@@ -29,7 +29,7 @@ orbs:
           name: Upload file to S3
           command: aws s3 sync ./dist/ s3://circle-ci-s3-deploy --delete
 workflows:
-  run:
+  build:
     jobs:
       - build_project
       - deploy_project:
