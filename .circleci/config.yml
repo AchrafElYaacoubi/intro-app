@@ -7,34 +7,34 @@ jobs:
     docker:
       - image: circleci/node:14.10
     steps:
-      - checkout
-      - restore_cache:
-          keys:
-          - intro-app-{{ checksum "yarn.lock" }}
-          - intro-app
-      - run: yarn install --frozen-lockfile
-      - run: yarn test
-      - run: yarn build
-      - save_cache:
-          key: intro-app-{{ checksum "yarn.lock" }}
-          paths:
-          - node_modules
-      - persist_to_workspace:
-        root: .
+    - checkout
+    - restore_cache:
+        keys:
+        - intro-app-{{ checksum "yarn.lock" }}
+        - intro-app
+    - run: yarn install --frozen-lockfile
+    - run: yarn test
+    - run: yarn build
+    - save_cache:
+        key: intro-app-{{ checksum "yarn.lock" }}
         paths:
-          - .
+        - node_modules
+    - persist_to_workspace:
+      root: .
+      paths:
+        - .
   deploy_project:
     executor: aws-cli/default
     steps:
-      - attach_workspace:
-        at: .
-      - aws-cli/setup:
-        profile-name: default
-      - run:
-        name: Upload file to S3
-        command: aws s3 sync ./dist/ s3://circle-ci-s3-deploy --delete
+    - attach_workspace:
+      at: .
+    - aws-cli/setup:
+      profile-name: default
+    - run:
+      name: Upload file to S3
+      command: aws s3 sync ./dist/ s3://circle-ci-s3-deploy --delete
 workflows:
-  build:
+  run:
     jobs:
       - build_project
       - deploy_project:
