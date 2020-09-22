@@ -30,7 +30,7 @@ jobs:
       - run: echo ${AWS_SECRET_ACCESS_KE}
       - run:
           name: Upload file to S3
-          command: aws s3 sync ./build/ s3://circle-ci-s3-deploy --delete
+          command: aws s3 sync ./build/ s3://intro-app --delete
 
 workflows:
   run:
