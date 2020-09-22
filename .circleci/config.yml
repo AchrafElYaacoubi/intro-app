@@ -1,33 +1,38 @@
 version: 2.1
 orbs:
   aws-cli: circleci/aws-cli@0.1.18
-  jobs:
-    build_project:
-      working_directory: ~/intro-app
-      docker:
-        - image: node:14.10
-      steps:
-        - checkout
-        - run:
-          name: Installing dependencies
-          command: yarn
-        - run:
-          name: Building project
-          command: yarn build
-        - persist_to_workspace:
-          root: .
+jobs:
+  build_project:
+    working_directory: ~/intro-app
+    docker:
+      - image: circleci/node:14.10
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+          - intro-app-{{ checksum "yarn.lock" }}
+          - intro-app
+      - run: yarn install --frozen-lockfile
+      - run: yarn test
+      - run: yarn build
+      - save_cache:
+          key: intro-app-{{ checksum "yarn.lock" }}
           paths:
-            - .
-    deploy_project:
-      executor: aws-cli/default
-      steps:
-        - attach_workspace:
-          at: .
-        - aws-cli/setup:
-          profile-name: default
-        - run:
-          name: Upload file to S3
-          command: aws s3 sync ./dist/ s3://circle-ci-s3-deploy --delete
+          - node_modules
+      - persist_to_workspace:
+        root: .
+        paths:
+          - .
+  deploy_project:
+    executor: aws-cli/default
+    steps:
+      - attach_workspace:
+        at: .
+      - aws-cli/setup:
+        profile-name: default
+      - run:
+        name: Upload file to S3
+        command: aws s3 sync ./dist/ s3://circle-ci-s3-deploy --delete
 workflows:
   build:
     jobs:
